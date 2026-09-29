@@ -1,384 +1,759 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Notice Board</title>
+<title>Smart Notice Board Summarizer</title>
+
 <style>
-/* GENERAL */
-*{box-sizing:border-box}
-:root{--background:#f4f7fb;--card:#fff;--soft:#eef4ff;--text:#172033;--muted:#667085;--border:#d8e0ec;--primary:#315efb;--primary-dark:#2347c7;--success:#16865b}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--background);color:var(--text)}
-button,textarea{font-family:inherit}
+* {
+    box-sizing: border-box;
+}
 
-/* HEADER */
-.header{background:var(--card);border-bottom:1px solid var(--border);padding:22px 6%;display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:45px;height:45px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#315efb,#7c4dff);color:#fff;font-size:22px}
-.brand h1{margin:0;font-size:21px}
-.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.badge{background:var(--soft);border:1px solid var(--border);padding:8px 13px;border-radius:20px;color:var(--muted);font-size:12px}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
 
-/* MAIN */
-main{width:92%;max-width:1150px;margin:35px auto 60px}
-.hero{margin-bottom:25px}
-.hero h2{margin:0 0 8px;font-size:40px;letter-spacing:-1px}
-.hero p{max-width:720px;color:var(--muted);line-height:1.6}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+header {
+    background: white;
+    padding: 20px 5%;
+    border-bottom: 1px solid #d8e0ec;
+}
 
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(30,50,90,.08)}
-.card h3{margin:0 0 7px;font-size:19px}
-.description{margin:0 0 18px;color:var(--muted);font-size:13px}
+header h1 {
+    margin: 0;
+    color: #315efb;
+}
 
-/* TEXT AREA */
-textarea{width:100%;min-height:310px;resize:vertical;padding:17px;border:1px solid var(--border);border-radius:15px;outline:none;background:var(--soft);color:var(--text);font-size:15px;line-height:1.6}
-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,94,251,.12)}
+header p {
+    color: #667085;
+}
 
-/* BUTTONS */
-.mode-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-button{padding:11px 15px;border-radius:11px;cursor:pointer;font-weight:600;transition:.2s}
-.mode{background:transparent;border:1px solid transparent;color:var(--muted)}
-.mode:hover{border-color:var(--primary)}
-.mode.active{background:var(--soft);color:var(--primary);border-color:var(--primary)}
-.generate{background:var(--primary);color:#fff;border:1px solid var(--primary);min-width:105px}
-.generate:hover{background:var(--primary-dark)}
-.secondary{background:var(--soft);color:var(--text);border:1px solid var(--border)}
-.secondary:hover{border-color:var(--primary)}
+main {
+    max-width: 1150px;
+    margin: 30px auto;
+    padding: 20px;
+}
 
-/* STATUS */
-.status{margin-top:13px;min-height:18px;color:var(--muted);font-size:12px}
-.status.error{color:#c92a2a}
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
 
-/* NOTICE RESULT */
-.notice{display:none}
-.notice.visible{display:block}
-.notice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
-.notice-label{display:inline-block;margin-bottom:7px;color:var(--primary);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
-.notice-title{margin:0;font-size:24px}
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid #d8e0ec;
+    box-shadow: 0 6px 20px #1e325010;
+    min-width: 0;
+}
 
-/* INFO BOXES */
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.info{background:var(--soft);border:1px solid var(--border);border-radius:13px;padding:13px}
-.info span{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
-.info strong{font-size:14px}
+textarea {
+    width: 100%;
+    min-height: 280px;
+    padding: 14px;
+    border: 1px solid #d8e0ec;
+    border-radius: 10px;
+    background: #eef4ff;
+    font: 15px/1.6 Arial, sans-serif;
+    resize: vertical;
+}
 
-/* SUMMARY */
-.summary-box{background:var(--soft);border-left:4px solid var(--primary);padding:15px;border-radius:0 13px 13px 0}
-.summary-box p{margin:0;line-height:1.65}
+button, select, input {
+    font: inherit;
+}
 
-/* POINTS */
-.points{margin:17px 0 0;padding:0;list-style:none}
-.points li{position:relative;padding:10px 0 10px 27px;border-bottom:1px solid var(--border);line-height:1.5}
-.points li::before{content:"✓";position:absolute;left:0;color:var(--success);font-weight:bold}
+button {
+    padding: 10px 14px;
+    margin: 4px 3px 4px 0;
+    border: 1px solid #d8e0ec;
+    border-radius: 9px;
+    background: white;
+    cursor: pointer;
+}
 
-/* COPY */
-.copy-button{margin-top:15px;background:var(--primary);color:#fff;border:none}
-.copy-button:hover{background:var(--primary-dark)}
+button:hover {
+    border-color: #315efb;
+}
 
-/* FOOTER */
-.footer{text-align:center;margin-top:25px;color:var(--muted);font-size:12px}
+.primary {
+    background: #315efb;
+    color: white;
+    border-color: #315efb;
+}
 
-/* MOBILE */
-@media (max-width:800px){
-  .header{padding:20px 5%}
-  .badge{display:none}
-  .hero h2{font-size:31px}
-  .grid{grid-template-columns:1fr}
-  textarea{min-height:260px}
-  .info-grid{grid-template-columns:1fr}
-  .mode-row button{flex:1}
+.active {
+    background: #eef4ff;
+    color: #315efb;
+    border-color: #315efb;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+select {
+    padding: 9px;
+    border: 1px solid #d8e0ec;
+    border-radius: 8px;
+    background: white;
+}
+
+.result {
+    display: none;
+}
+
+.result.show {
+    display: block;
+}
+
+.muted {
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #e7efff;
+    color: #2547b8;
+    font-size: 12px;
+}
+
+.facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.fact {
+    background: #eef4ff;
+    padding: 12px;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+
+.fact small {
+    display: block;
+    color: #667085;
+    margin-bottom: 6px;
+}
+
+.summary {
+    padding: 15px;
+    background: #eef4ff;
+    border-left: 4px solid #315efb;
+    border-radius: 0 10px 10px 0;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+li {
+    padding: 9px 0;
+    border-bottom: 1px solid #e2e8f0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.task {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #d8e0ec;
+    border-radius: 10px;
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.task input {
+    margin-top: 4px;
+    accent-color: #315efb;
+}
+
+.task.done span {
+    text-decoration: line-through;
+    color: #667085;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+@media (max-width: 760px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    header, .input-card, .history-card {
+        display: none;
+    }
+
+    .layout {
+        display: block;
+    }
+
+    .result {
+        display: block;
+    }
 }
 </style>
 </head>
 
 <body>
-<div class="app">
 
-<header class="header">
-  <div class="brand">
-    <div class="logo">📌</div>
-    <div>
-      <h1>Smart Notice Board</h1>
-      <p>Convert long circulars into student-friendly updates</p>
-    </div>
-  </div>
-  <div class="badge">NLP Prototype</div>
+<header>
+    <h1>📌 Smart Notice Board</h1>
+    <p>Turn long circulars into student-friendly updates</p>
 </header>
 
 <main>
-  <section class="hero">
     <h2>Understand notices faster.</h2>
-    <p>Paste a long college circular below. The system identifies important information such as dates, times, venues and deadlines and converts it into a simple student-friendly update.</p>
-  </section>
+    <p class="muted">
+        Paste a circular to extract important dates, deadlines,
+        categories, and action items. This prototype uses
+        rule-based summarization, not an AI model.
+    </p>
 
-  <section class="grid">
+    <div class="layout">
 
-    <!-- INPUT CARD -->
-    <div class="card">
-      <h3>📄 Circular Input</h3>
-      <p class="description">Paste the complete text of a college circular.</p>
+        <!-- INPUT SECTION -->
+        <section class="card input-card">
+            <h3>📄 Circular Input</h3>
 
-      <textarea id="circularInput" placeholder="Paste the circular text here..."></textarea>
+            <textarea id="notice"
+                placeholder="Paste the full circular here..."></textarea>
 
-      <div class="mode-row">
-        <button class="mode active" id="quickBtn" onclick="setMode('quick')">Quick</button>
-        <button class="mode" id="detailedBtn" onclick="setMode('detailed')">Detailed</button>
-        <button class="generate" onclick="summarizeNotice()">Summarize</button>
-        <button class="secondary" onclick="loadExample()">Try sample</button>
-        <button class="secondary" onclick="clearAll()">Clear</button>
-      </div>
+            <div class="row">
+                <button id="quick" class="active"
+                    onclick="setMode('quick')">Quick</button>
 
-      <div class="status" id="status"></div>
+                <button id="detailed"
+                    onclick="setMode('detailed')">Detailed</button>
+
+                <button class="primary"
+                    onclick="summarize()">Summarize</button>
+
+                <button onclick="loadSample()">Try sample</button>
+
+                <button onclick="clearInput()">Clear</button>
+            </div>
+
+            <div class="row">
+                <label class="muted">
+                    Department:
+                    <select id="dept">
+                        <option value="">All departments</option>
+                        <option>ECE</option>
+                        <option>CSE</option>
+                        <option>EEE</option>
+                        <option>Mechanical</option>
+                        <option>Civil</option>
+                    </select>
+                </label>
+
+                <label class="muted">
+                    Semester:
+                    <select id="sem">
+                        <option value="">All semesters</option>
+                        <option>S1</option>
+                        <option>S2</option>
+                        <option>S3</option>
+                        <option>S4</option>
+                        <option>S5</option>
+                        <option>S6</option>
+                        <option>S7</option>
+                        <option>S8</option>
+                    </select>
+                </label>
+            </div>
+
+            <p class="muted">Upload a plain text file:</p>
+            <input type="file" id="file"
+                accept=".txt,text/plain"
+                onchange="uploadText(event)">
+
+            <p class="muted" id="status" role="status"></p>
+        </section>
+
+        <!-- OUTPUT SECTION -->
+        <section class="card result" id="result">
+
+            <p class="muted">STUDENT UPDATE</p>
+            <h2 id="title">Important Notice</h2>
+            <span class="badge" id="category">General</span>
+
+            <div class="facts">
+                <div class="fact">
+                    <small>DATES</small>
+                    <strong id="dates">Not detected</strong>
+                </div>
+
+                <div class="fact">
+                    <small>TIME</small>
+                    <strong id="time">Not detected</strong>
+                </div>
+
+                <div class="fact">
+                    <small>VENUE</small>
+                    <strong id="venue">Not detected</strong>
+                </div>
+
+                <div class="fact">
+                    <small>DEADLINE</small>
+                    <strong id="deadline">Not detected</strong>
+                </div>
+            </div>
+
+            <h3>Short Summary</h3>
+            <div class="summary" id="summary"></div>
+
+            <h3>Important Points</h3>
+            <ul id="points"></ul>
+
+            <h3>Action Checklist</h3>
+            <div id="tasks"></div>
+
+            <div class="row">
+                <button class="primary" onclick="copyUpdate()">
+                    📋 Copy Update
+                </button>
+
+                <button onclick="downloadUpdate()">
+                    ⬇ Download
+                </button>
+
+                <button onclick="window.print()">Print</button>
+            </div>
+
+            <p class="muted">
+                Verify important details against the original notice.
+            </p>
+        </section>
     </div>
 
-    <!-- RESULT CARD -->
-    <div class="card notice" id="noticeCard">
-      <div class="notice-header">
-        <div>
-          <div class="notice-label">Student Update</div>
-          <h3 class="notice-title" id="noticeTitle">Important Notice</h3>
-        </div>
-        <div>🔔</div>
-      </div>
-
-      <div class="info-grid">
-        <div class="info"><span>DATE</span><strong id="dateValue">Not detected</strong></div>
-        <div class="info"><span>TIME</span><strong id="timeValue">Not detected</strong></div>
-        <div class="info"><span>VENUE</span><strong id="venueValue">Not detected</strong></div>
-        <div class="info"><span>DEADLINE</span><strong id="deadlineValue">Not detected</strong></div>
-      </div>
-
-      <div class="summary-box"><p id="summaryText">Your summary will appear here.</p></div>
-
-      <ul class="points" id="importantPoints"></ul>
-
-      <button class="copy-button" id="copyBtn" onclick="copyNotice()">📋 Copy Update</button>
-    </div>
-
-  </section>
-
-  <div class="footer">Smart Notice Board • HTML + CSS + JavaScript Prototype</div>
+    <!-- HISTORY -->
+    <section class="card history-card" style="margin-top:20px">
+        <h3>🕘 Recent Summaries</h3>
+        <div id="history" class="muted">No summaries yet.</div>
+        <button onclick="clearHistory()">Clear History</button>
+    </section>
 </main>
-</div>
 
 <script>
-/* ---------- STATE & ELEMENTS ---------- */
-let currentMode = "quick";
+"use strict";
 
-const input     = document.getElementById("circularInput");
-const noticeCard = document.getElementById("noticeCard");
-const statusBox = document.getElementById("status");
+let mode = "quick";
 
-const MONTHS = "(?:January|February|March|April|May|June|July|August|September|October|November|December)";
-const NOT_FOUND = "Not detected";
+const $ = id => document.getElementById(id);
 
-const SAMPLE = `GOVERNMENT ENGINEERING COLLEGE
-Ref. No: GEC/ACAD/2026/145        Date: 24 September 2026
+const sampleText = `ABC College of Engineering
+Subject: S5 Academic Activities and Internal Examination Notice
 
-CIRCULAR
+All S5 Electronics and Communication Engineering students are informed that the First Internal Assessment Examination will be held from 12 October 2026 to 17 October 2026. The detailed timetable will be published on 5 October 2026.
 
-Subject: Conduct of Series Test II and submission of internal assessment records for B.Tech Semesters III, V and VII
+Laboratory records must be submitted by 8 October 2026. Practical assessments will take place from 19 October 2026 to 23 October 2026 in the department laboratory.
 
-It is hereby notified for the information of all students and faculty members that, in accordance with the academic calendar approved by the Academic Council, the Series Test II examinations shall be conducted from 6 October 2026 to 10 October 2026. The examinations will commence at 9:30 AM and conclude at 11:00 AM on all days. Students are required to occupy their allotted seats by 9:15 AM. Students reporting after 9:45 AM shall not be permitted to enter the examination hall under any circumstances.
+All pending assignments must be submitted by 9 October 2026. Students with attendance shortages should meet their class tutor by 6 October 2026.
 
-Students must carry their college identity cards. Entry without an ID card shall not be permitted, and a temporary pass may be obtained from the Office only with a fine of Rs. 50. Use of mobile phones, smart watches and programmable calculators is strictly prohibited inside the hall. Detailed timetables shall be displayed on departmental notice boards by 30 September 2026.
+A technical workshop on Embedded Systems will be held on 31 October 2026 from 9:30 AM to 4:00 PM in the department seminar hall. Registration closes on 20 October 2026.`;
 
-Students having attendance below 75% as on 3 October 2026 shall not be eligible to appear for the Series Test unless condonation is granted. Applications for condonation along with a medical certificate, where applicable, must be submitted to the respective Head of Department on or before 1 October 2026. A condonation fee of Rs. 250 per subject shall be remitted at the college office.
+// SELECT SUMMARY MODE
+function setMode(m) {
+    mode = m;
 
-Principal`;
+    $("quick").classList.toggle("active", m === "quick");
+    $("detailed").classList.toggle("active", m === "detailed");
 
-/* ---------- MODE ---------- */
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById("quickBtn").classList.toggle("active", mode === "quick");
-  document.getElementById("detailedBtn").classList.toggle("active", mode === "detailed");
-  showStatus(mode === "quick"
-    ? "Quick mode: showing the most useful information."
-    : "Detailed mode: showing more important points.");
-  if (noticeCard.classList.contains("visible") && input.value.trim()) summarizeNotice();
+    $("status").textContent =
+        m === "quick" ? "Quick mode selected." : "Detailed mode selected.";
 }
 
-function showStatus(msg, isError) {
-  statusBox.textContent = msg;
-  statusBox.classList.toggle("error", !!isError);
+// SPLIT TEXT INTO SENTENCES
+function splitSentences(text) {
+    return text
+        .replace(/\s+/g, " ")
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(Boolean);
 }
 
-/* ---------- EXTRACTORS ---------- */
-function extractDate(text) {
-  const patterns = [
-    /\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/,
-    new RegExp("\\b\\d{1,2}(?:st|nd|rd|th)?\\s+" + MONTHS + "\\s+\\d{4}\\b", "i"),
-    new RegExp("\\b" + MONTHS + "\\s+\\d{1,2}(?:st|nd|rd|th)?,?\\s+\\d{4}\\b", "i")
-  ];
-  // Skip the circular's own issue date ("Date: 24 September 2026")
-  const body = text.replace(/^.*\b(?:Ref\.?\s*No|Date)\s*:.*$/gim, "");
-  for (const p of patterns) {
-    const m = body.match(p);
-    if (m) {
-      // Show a range if "from X to Y"
-      const range = body.match(new RegExp(
-        "(" + m[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")\\s*(?:to|-|–|till|until)\\s*(\\d{1,2}(?:st|nd|rd|th)?\\s+" + MONTHS + "\\s+\\d{4})", "i"));
-      return range ? range[1] + " – " + range[2] : m[0];
+// EXTRACT DATES
+function getDates(text) {
+    const regex = /\b(?:\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+\d{4})\b/gi;
+
+    return [...new Set(text.match(regex) || [])];
+}
+
+// DETECT CATEGORY
+function getCategory(text) {
+    const t = text.toLowerCase();
+
+    if (/exam|examination|hall ticket/.test(t))
+        return "Examination";
+
+    if (/assignment|submission/.test(t))
+        return "Assignment / Submission";
+
+    if (/workshop|seminar|event/.test(t))
+        return "Workshop / Event";
+
+    if (/project|review/.test(t))
+        return "Project";
+
+    if (/internship|placement/.test(t))
+        return "Placement / Internship";
+
+    if (/scholarship/.test(t))
+        return "Scholarship";
+
+    if (/attendance/.test(t))
+        return "Attendance";
+
+    return "General Notice";
+}
+
+// EXTRACT TITLE
+function getTitle(text) {
+    const lines = text.split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+    const subject = lines.find(s =>
+        /^(subject|sub)\s*:/i.test(s)
+    );
+
+    return (
+        subject
+            ? subject.replace(/^(subject|sub)\s*:\s*/i, "")
+            : lines.find(s => s.length > 5) || "Important Notice"
+    ).slice(0, 130);
+}
+
+// SELECT IMPORTANT SENTENCES
+function getImportantSentences(text) {
+    const keywords =
+        /important|mandatory|deadline|submit|exam|registration|attendance|venue|date|time|bring|report|required|eligible|must|conducted|contact|upload|workshop|review|apply|register/i;
+
+    const sentences = splitSentences(text);
+
+    const scored = sentences.map((sentence, index) => {
+        let score = 0;
+
+        if (keywords.test(sentence)) score += 2;
+        if (getDates(sentence).length) score += 3;
+
+        return { sentence, index, score };
+    });
+
+    return scored
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score || a.index - b.index)
+        .slice(0, mode === "quick" ? 4 : 9)
+        .sort((a, b) => a.index - b.index)
+        .map(item => item.sentence);
+}
+
+// MAIN SUMMARIZATION FUNCTION
+function summarize() {
+    const text = $("notice").value.trim();
+
+    if (!text) {
+        $("status").textContent = "Please paste a circular first.";
+        return;
     }
-  }
-  return NOT_FOUND;
+
+    const department = $("dept").value;
+    const semester = $("sem").value;
+
+    if (department && !text.toLowerCase().includes(department.toLowerCase())) {
+        $("status").textContent =
+            "Selected department was not detected. Verify relevance manually.";
+    } else {
+        $("status").textContent = "";
+    }
+
+    if (semester && !new RegExp("\\b" + semester + "\\b", "i").test(text)) {
+        $("status").textContent +=
+            " Selected semester was not detected. Verify relevance manually.";
+    }
+
+    const sentences = splitSentences(text);
+    const important = getImportantSentences(text);
+
+    const selected = important.length
+        ? important
+        : sentences.slice(0, mode === "quick" ? 4 : 9);
+
+    const summary = selected.slice(
+        0, mode === "quick" ? 2 : 5
+    ).join(" ");
+
+    $("title").textContent = getTitle(text);
+    $("category").textContent = getCategory(text);
+    $("summary").textContent = summary;
+
+    const dates = getDates(text);
+
+    $("dates").textContent = dates.length
+        ? dates.slice(0, 5).join(" – ")
+        : "Not detected";
+
+    const time = text.match(
+        /\b\d{1,2}(?::\d{2})?\s*(?:AM|PM)\b/i
+    );
+
+    $("time").textContent = time ? time[0] : "Not detected";
+
+    const venue = text.match(
+        /\b(?:venue|location|hall|room)\s*[:\-]\s*([^.;\n]{2,80})/i
+    ) || text.match(
+        /\b(?:held|conducted)\s+(?:at|in)\s+([^.;\n]{2,80})/i
+    );
+
+    $("venue").textContent = venue
+        ? venue[1].trim()
+        : "Not detected";
+
+    const deadline = text.match(
+        /\b(?:deadline|last date|due date|registration closes|submit(?:ted)?\s+(?:on|before|by)|must be submitted by)\s*[:\-]?\s*([^.;\n]{2,100})/i
+    );
+
+    $("deadline").textContent = deadline
+        ? deadline[1].trim()
+        : "Not detected";
+
+    // DISPLAY IMPORTANT POINTS
+    $("points").replaceChildren();
+
+    selected.forEach(sentence => {
+        const li = document.createElement("li");
+        li.textContent = sentence;
+        $("points").appendChild(li);
+    });
+
+    // CREATE ACTION CHECKLIST
+    $("tasks").replaceChildren();
+
+    const actions = selected.filter(sentence =>
+        /\b(submit|register|apply|upload|bring|contact|meet|report|attend|download|return|pay|complete|prepare|check)\b/i.test(sentence)
+    );
+
+    if (!actions.length) {
+        $("tasks").textContent = "No clear action items detected.";
+    } else {
+        actions.forEach(sentence => {
+            const label = document.createElement("label");
+            label.className = "task";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+
+            checkbox.onchange = () => {
+                label.classList.toggle("done", checkbox.checked);
+            };
+
+            const span = document.createElement("span");
+            span.textContent = sentence;
+
+            label.append(checkbox, span);
+            $("tasks").appendChild(label);
+        });
+    }
+
+    $("result").classList.add("show");
+
+    $("status").textContent =
+        "Summary ready. Please verify the original notice.";
+
+    saveHistory({
+        title: $("title").textContent,
+        text,
+        category: $("category").textContent
+    });
 }
 
-function extractTime(text) {
-  const times = text.match(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm)\b/g);
-  if (!times) return NOT_FOUND;
-  // Show start–end if the first two look like a range
-  return times.length >= 2 && /commence|start|begin|from/i.test(text)
-    ? times[0] + " – " + times[1]
-    : times[0];
+// LOAD SAMPLE
+function loadSample() {
+    $("notice").value = sampleText;
+    $("status").textContent = "Sample loaded. Click Summarize.";
 }
 
-function extractVenue(text) {
-  const patterns = [
-    /(?:venue|location)\s*[:\-]\s*([A-Za-z0-9][A-Za-z0-9 ,&-]{2,60})/i,
-    /(?:held|conducted|organized|organised)\s+(?:at|in)\s+(?:the\s+)?([A-Za-z0-9][A-Za-z0-9 ,&-]{2,60})/i
-  ];
-  for (const p of patterns) {
-    const m = text.match(p);
-    if (m) return m[1].replace(/[.\n].*$/, "").trim();
-  }
-  return NOT_FOUND;
+// CLEAR INPUT
+function clearInput() {
+    $("notice").value = "";
+    $("file").value = "";
+    $("result").classList.remove("show");
+    $("status").textContent = "Cleared.";
 }
 
-function extractDeadline(text) {
-  const dateBit = "(\\d{1,2}(?:st|nd|rd|th)?\\s+" + MONTHS + "(?:,?\\s+\\d{4})?|" + MONTHS + "\\s+\\d{1,2}(?:st|nd|rd|th)?(?:,?\\s+\\d{4})?|\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{2,4})";
-  const withDate = new RegExp(
-    "(?:deadline|last date|on or before|not later than|due(?:\\s+(?:on|by))?)\\s*(?:is|:|-)?\\s*" + dateBit, "i");
-  let m = text.match(withDate);
-  if (m) return m[1].trim();
+// UPLOAD TEXT FILE
+function uploadText(event) {
+    const file = event.target.files[0];
 
-  m = text.match(/(?:deadline|last date|submit(?:ted)?\s+(?:on|before|by)|registration.*?(?:closes|ends))\s*[:\-]?\s*([^.\n]+)/i);
-  return m ? m[1].trim() : NOT_FOUND;
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        $("status").textContent = "Choose a file under 2 MB.";
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+        $("notice").value = String(reader.result || "");
+        $("status").textContent = "Text file loaded.";
+    };
+
+    reader.onerror = () => {
+        $("status").textContent = "Could not read file.";
+    };
+
+    reader.readAsText(file);
 }
 
-function extractTitle(text) {
-  let m = text.match(/Subject\s*[:\-]\s*(.+)/i);
-  let title = m ? m[1] : (text.split("\n").find(l => l.trim().length > 5) || "Important Notice");
-  title = title.replace(/\s+/g, " ").trim();
-  return title.length > 90 ? title.slice(0, 87).trim() + "…" : title;
+// FORMAT UPDATE
+function updateText() {
+    const points = [...$("points").querySelectorAll("li")]
+        .map(li => "• " + li.textContent)
+        .join("\n");
+
+    return `${$("title").textContent}
+Category: ${$("category").textContent}
+Dates: ${$("dates").textContent}
+Time: ${$("time").textContent}
+Venue: ${$("venue").textContent}
+Deadline: ${$("deadline").textContent}
+
+Summary:
+${$("summary").textContent}
+
+Important Points:
+${points}
+
+Please verify details with the original notice.`;
 }
 
-/* ---------- IMPORTANT SENTENCES ---------- */
-function findImportantSentences(text) {
-  const keywords = ["important","mandatory","deadline","submit","exam","examination","registration",
-    "attendance","venue","date","time","bring","report","last date","required","eligible","students",
-    "fine","fee","prohibited","not be permitted","must","before","carry"];
-
-  const sentences = text
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?])\s+(?=[A-Z])/)
-    .map(s => s.trim())
-    .filter(s => s.length > 25 && !/^(?:Ref\.?|Subject|Date)\b/i.test(s));
-
-  const scored = sentences.map((sentence, index) => {
-    const lower = sentence.toLowerCase();
-    let score = 0;
-    keywords.forEach(k => { if (lower.includes(k)) score++; });
-    if (/\d/.test(sentence)) score += 1;
-    if (/\bnot\b|\bprohibited\b|\bmust\b|\bmandatory\b/.test(lower)) score += 1;
-    if (sentence.length > 260) score -= 1;
-    return { sentence, index, score };
-  });
-
-  return scored;
+// COPY UPDATE
+async function copyUpdate() {
+    try {
+        await navigator.clipboard.writeText(updateText());
+        $("status").textContent = "Update copied.";
+    } catch (error) {
+        $("status").textContent =
+            "Clipboard blocked. Please copy the summary manually.";
+    }
 }
 
-function shorten(s, max) {
-  s = s.replace(/^(?:It is hereby notified[^,]*that,?\s*)/i, "").trim();
-  s = s.charAt(0).toUpperCase() + s.slice(1);
-  return s.length > max ? s.slice(0, max - 1).replace(/\s+\S*$/, "") + "…" : s;
+// DOWNLOAD SUMMARY
+function downloadUpdate() {
+    const blob = new Blob(
+        [updateText()],
+        { type: "text/plain;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "notice-summary.txt";
+    link.click();
+
+    URL.revokeObjectURL(url);
 }
 
-/* ---------- MAIN ACTION ---------- */
-function summarizeNotice() {
-  const text = input.value.trim();
-  if (text.length < 40) {
-    showStatus("Please paste a longer circular first.", true);
-    return;
-  }
-
-  const scored = findImportantSentences(text);
-  if (!scored.length) {
-    showStatus("Couldn't find enough sentences to summarise.", true);
-    return;
-  }
-
-  const limit = currentMode === "quick" ? 3 : 6;
-  const top = [...scored].sort((a, b) => b.score - a.score).slice(0, limit)
-    .sort((a, b) => a.index - b.index);
-
-  // Fill the boxes
-  document.getElementById("noticeTitle").textContent    = extractTitle(text);
-  document.getElementById("dateValue").textContent      = extractDate(text);
-  document.getElementById("timeValue").textContent      = extractTime(text);
-  document.getElementById("venueValue").textContent     = extractVenue(text);
-  document.getElementById("deadlineValue").textContent  = extractDeadline(text);
-
-  // Summary = single most important sentence
-  const best = [...scored].sort((a, b) => b.score - a.score)[0];
-  document.getElementById("summaryText").textContent = shorten(best.sentence, 220);
-
-  // Points
-  const list = document.getElementById("importantPoints");
-  list.innerHTML = "";
-  top.forEach(t => {
-    const li = document.createElement("li");
-    li.textContent = shorten(t.sentence, currentMode === "quick" ? 130 : 200);
-    list.appendChild(li);
-  });
-
-  noticeCard.classList.add("visible");
-  showStatus("Summary ready.");
+// HISTORY
+function readHistory() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("noticeHistory") || "[]"
+        );
+    } catch (error) {
+        return [];
+    }
 }
 
-/* ---------- HELPERS ---------- */
-function loadExample() {
-  input.value = SAMPLE;
-  showStatus("Sample circular loaded. Click Summarize.");
+function saveHistory(item) {
+    try {
+        const history = readHistory();
+
+        history.unshift({
+            ...item,
+            when: new Date().toLocaleString()
+        });
+
+        localStorage.setItem(
+            "noticeHistory",
+            JSON.stringify(history.slice(0, 5))
+        );
+
+        renderHistory();
+    } catch (error) {
+        console.log("History storage unavailable.");
+    }
 }
 
-function clearAll() {
-  input.value = "";
-  noticeCard.classList.remove("visible");
-  document.getElementById("importantPoints").innerHTML = "";
-  showStatus("");
+function renderHistory() {
+    const history = readHistory();
+    const box = $("history");
+
+    box.replaceChildren();
+
+    if (!history.length) {
+        box.textContent = "No summaries yet.";
+        return;
+    }
+
+    history.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "history-item";
+
+        const text = document.createElement("span");
+        text.textContent =
+            item.title + " — " + item.category + " (" + item.when + ")";
+
+        const button = document.createElement("button");
+        button.textContent = "Load";
+
+        button.onclick = () => {
+            $("notice").value = item.text;
+            summarize();
+        };
+
+        row.append(text, button);
+        box.appendChild(row);
+    });
 }
 
-function copyNotice() {
-  const get = id => document.getElementById(id).textContent;
-  const points = [...document.querySelectorAll("#importantPoints li")].map(li => "• " + li.textContent).join("\n");
-
-  const lines = ["📌 " + get("noticeTitle"), "", get("summaryText"), ""];
-  [["📅 Date", "dateValue"], ["⏰ Time", "timeValue"], ["📍 Venue", "venueValue"], ["⚠️ Deadline", "deadlineValue"]]
-    .forEach(([label, id]) => { if (get(id) !== NOT_FOUND) lines.push(label + ": " + get(id)); });
-  lines.push("", points);
-  const message = lines.join("\n").trim();
-
-  const btn = document.getElementById("copyBtn");
-  const done = ok => {
-    btn.textContent = ok ? "✓ Copied" : "Copy failed";
-    setTimeout(() => btn.textContent = "📋 Copy Update", 1800);
-  };
-
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(message).then(() => done(true), () => done(false));
-  } else {
-    const ta = document.createElement("textarea");
-    ta.value = message;
-    document.body.appendChild(ta);
-    ta.select();
-    let ok = false;
-    try { ok = document.execCommand("copy"); } catch (e) {}
-    ta.remove();
-    done(ok);
-  }
+// CLEAR HISTORY
+function clearHistory() {
+    localStorage.removeItem("noticeHistory");
+    renderHistory();
 }
+
+renderHistory();
 </script>
+
 </body>
 </html>
