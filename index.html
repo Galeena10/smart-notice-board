@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,20 +202,6 @@ li {
         grid-template-columns: 1fr;
     }
 }
-
-@media print {
-    header, .input-card, .history-card {
-        display: none;
-    }
-
-    .layout {
-        display: block;
-    }
-
-    .result {
-        display: block;
-    }
-}
 </style>
 </head>
 
@@ -338,12 +323,6 @@ li {
                 <button class="primary" onclick="copyUpdate()">
                     📋 Copy Update
                 </button>
-
-                <button onclick="downloadUpdate()">
-                    ⬇ Download
-                </button>
-
-                <button onclick="window.print()">Print</button>
             </div>
 
             <p class="muted">
@@ -433,7 +412,7 @@ function getCategory(text) {
     return "General Notice";
 }
 
-// EXTRACT TITLE
+// EXTRACT TITLE (full text, no truncation)
 function getTitle(text) {
     const lines = text.split(/\r?\n/)
         .map(s => s.trim())
@@ -443,11 +422,9 @@ function getTitle(text) {
         /^(subject|sub)\s*:/i.test(s)
     );
 
-    return (
-        subject
-            ? subject.replace(/^(subject|sub)\s*:\s*/i, "")
-            : lines.find(s => s.length > 5) || "Important Notice"
-    ).slice(0, 130);
+    return subject
+        ? subject.replace(/^(subject|sub)\s*:\s*/i, "")
+        : lines.find(s => s.length > 5) || "Important Notice";
 }
 
 // SELECT IMPORTANT SENTENCES
@@ -664,23 +641,6 @@ async function copyUpdate() {
         $("status").textContent =
             "Clipboard blocked. Please copy the summary manually.";
     }
-}
-
-// DOWNLOAD SUMMARY
-function downloadUpdate() {
-    const blob = new Blob(
-        [updateText()],
-        { type: "text/plain;charset=utf-8" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "notice-summary.txt";
-    link.click();
-
-    URL.revokeObjectURL(url);
 }
 
 // HISTORY
